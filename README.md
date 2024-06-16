@@ -1,5 +1,5 @@
 # Astro Starter Kit: Basics
-
+El componente navbar.vue no tiene las url de .env porque se rompe el logout, igual que las paginas horario y guardiasHoy
 ```sh
 npm create astro@latest -- --template basics
 ```

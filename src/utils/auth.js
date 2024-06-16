@@ -1,12 +1,14 @@
 // src/utils/auth.js
 
+console.log('Base URL:', import.meta.env.PUBLIC_URL);
+
 export function getAuthenticatedUser() {
   const token = sessionStorage.getItem('authToken');
   if (!token) {
     return null;
   }
 
-  const apiUrl = 'http://127.0.0.1:8000/api/user';
+  const apiUrl = `${import.meta.env.PUBLIC_URL}/api/user`;
   const headers = {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -20,7 +22,7 @@ export function getAuthenticatedUser() {
 
 export async function loginUser(userName, password) {
   try {
-    const response = await fetch('http://127.0.0.1:8080/api/login', {
+    const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -46,7 +48,7 @@ export async function loginUser(userName, password) {
 
 export async function sendResetPasswordLink(email) {
   try {
-    const response = await fetch('http://127.0.0.1:8080/api/forgot-password', {
+    const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/forgot-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

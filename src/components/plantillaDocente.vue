@@ -22,7 +22,7 @@
     <!-- Búsqueda de docentes -->
     <div class="w-full md:w-1/2 flex flex-col items-start">
       <label for="search" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Buscar Docente:</label>
-      <input type="text" id="search" v-model="searchTerm" @input="searchUsers" class="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+      <input type="text" id="search" v-model="searchTerm" @input="searchUsers" class="block w-full text-sm text-gray-700 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 custom-text-color">
       <ul v-if="filteredUsers.length" class="mt-2 w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg">
         <li v-for="user in filteredUsers" :key="user.id" class="p-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200" @click="selectProfessor(user.id)">
           {{ user.name }}
@@ -34,7 +34,7 @@
     <div v-if="selectedProfessor" class="w-full mt-4">
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4" v-if="selectedUser">
         <h2 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">{{ selectedUser.name }}</h2>
-        <div class="flex space-x-4 mb-4">
+        <div class="grid grid-cols-2 gap-4 mb-4">
           <button @click="isEditVisible = true" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-700">Editar Usuario</button>
           <button @click="confirmDeleteProfessor" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700">Eliminar Usuario</button>
           <button @click="showFaltas" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700">Ver Faltas</button>
@@ -42,24 +42,24 @@
         </div>
 
         <!-- Formulario de edición -->
-        <div v-if="isEditVisible" class="mt-4">
+        <div v-if="isEditVisible" class="mt-4 ">
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Nombre:</label>
-          <input v-model="selectedUser.name" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+          <input v-model="selectedUser.name" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
           
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Username:</label>
-          <input v-model="selectedUser.user_name" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+          <input v-model="selectedUser.user_name" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
           
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Email:</label>
-          <input v-model="selectedUser.email" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+          <input v-model="selectedUser.email" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
 
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Contraseña:</label>
-          <input v-model="selectedUser.password" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+          <input v-model="selectedUser.password" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
 
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Código de Profesor:</label>
-          <input v-model="selectedUser.professor_cod" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+          <input v-model="selectedUser.professor_cod" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
           
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Rol:</label>
-          <select v-model="selectedUser.roles[0].name" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+          <select v-model="selectedUser.roles[0].name" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
             <option v-for="role in roles" :key="role.id" :value="role.name">{{ role.name }}</option>
           </select>
 
@@ -75,7 +75,7 @@
         <div v-if="loading" class="text-center py-4">Cargando ausencias...</div>
         <div v-if="!loading && ausencias.length === 0" class="text-center py-4">No hay ausencias registradas</div>
         <div v-if="!loading && ausencias.length > 0" class="w-full">
-          <table class="min-w-full bg-gray-800 text-white mt-4">
+          <table class="min-w-full bg-transparent text-white mt-4">
             <thead class="bg-gray-900 text-white">
               <tr>
                 <th class="w-1/2 px-4 py-2">Fecha</th>
@@ -100,10 +100,34 @@
 
     <!-- Contenedor para el horario -->
     <div v-if="isHorarioVisible" ref="scheduleContainer" class="w-full mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
-      <!-- Aquí se renderizará el horario -->
+      <div class="filter-container text-black mb-4">
+        <label for="day-filter" class="block mb-2 text-sm font-medium text-black">Elige un día:</label>
+        <select id="day-filter" v-model="selectedDay" class="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300">
+          <option value="">Todos</option>
+          <option value="L">Lunes</option>
+          <option value="M">Martes</option>
+          <option value="X">Miércoles</option>
+          <option value="J">Jueves</option>
+          <option value="V">Viernes</option>
+        </select>
+        <div class="mt-2 grid grid-cols-2 gap-2">
+          <button @click="applyFilter" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Aplicar Filtro</button>
+          <button @click="clearFilter" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-700">Quitar Filtro</button>
+        </div>
+      </div>
+      <div ref="scheduleContent" class="schedule-content"></div>
+    </div>
+
+    <!-- Modal -->
+    <div v-if="showModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6">
+        <p class="text-black mb-4">{{ modalMessage }}</p>
+        <button @click="closeModal" class="px-4 py-2 bg-blue-500 text-white rounded-md">Cerrar</button>
+      </div>
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -131,7 +155,10 @@ export default {
       selectedUser: null,
       loading: false,
       horarios: [],
-      franjas: []
+      franjas: [],
+      showModal: false,
+      modalMessage: '',
+      selectedDay: ''
     };
   },
   methods: {
@@ -140,14 +167,14 @@ export default {
     },
     async handleFileUpload() {
       if (!this.file) {
-        alert('Por favor, seleccione un archivo para cargar.');
+        this.showModalMessage('Por favor, seleccione un archivo para cargar.');
         return;
       }
 
       const token = sessionStorage.getItem('authToken');
       if (!token) {
         console.error('No se encontró el token de autenticación.');
-        alert('No se encontró el token de autenticación. Por favor, inicie sesión.');
+        this.showModalMessage('No se encontró el token de autenticación. Por favor, inicie sesión.');
         return;
       }
 
@@ -156,7 +183,7 @@ export default {
 
       try {
         this.isLoading = true;
-        const response = await fetch('http://127.0.0.1:8080/api/upload-xml', {  
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/upload-xml`, {  
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -171,10 +198,10 @@ export default {
 
         const result = await response.json();
         console.log('Archivo procesado:', result);
-        alert('Archivo procesado correctamente.');
+        this.showModalMessage('Archivo procesado correctamente.');
       } catch (error) {
         console.error('Error al subir el archivo:', error.message);  
-        alert(`Error al procesar el archivo: ${error.message}`);
+        this.showModalMessage(`Error al procesar el archivo: ${error.message}`);
       } finally {
         this.isLoading = false;
       }
@@ -184,11 +211,11 @@ export default {
         const token = sessionStorage.getItem('authToken');
         if (!token) {
           console.error('No se encontró el token de autenticación.');
-          alert('No se encontró el token de autenticación. Por favor, inicie sesión.');
+          this.showModalMessage('No se encontró el token de autenticación. Por favor, inicie sesión.');
           return;
         }
 
-        const response = await fetch('http://127.0.0.1:8080/api/users', {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/users`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -205,7 +232,7 @@ export default {
         this.users = users;
       } catch (error) {
         console.error('Error al obtener los usuarios:', error.message);
-        alert(`Error al obtener los usuarios: ${error.message}`);
+        this.showModalMessage(`Error al obtener los usuarios: ${error.message}`);
       }
     },
     async fetchRoles() {
@@ -213,11 +240,11 @@ export default {
         const token = sessionStorage.getItem('authToken');
         if (!token) {
           console.error('No se encontró el token de autenticación.');
-          alert('No se encontró el token de autenticación. Por favor, inicie sesión.');
+          this.showModalMessage('No se encontró el token de autenticación. Por favor, inicie sesión.');
           return;
         }
 
-        const response = await fetch('http://127.0.0.1:8080/api/roles', {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/roles`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -234,7 +261,7 @@ export default {
         this.roles = roles;
       } catch (error) {
         console.error('Error al obtener los roles:', error.message);
-        alert(`Error al obtener los roles: ${error.message}`);
+        this.showModalMessage(`Error al obtener los roles: ${error.message}`);
       }
     },
     filterUsers() {
@@ -260,7 +287,7 @@ export default {
         const token = sessionStorage.getItem('authToken');
         if (!token) {
           console.error('No se encontró el token de autenticación.');
-          alert('No se encontró el token de autenticación. Por favor, inicie sesión.');
+          this.showModalMessage('No se encontró el token de autenticación. Por favor, inicie sesión.');
           return;
         }
 
@@ -269,7 +296,7 @@ export default {
           roles: [this.selectedUser.roles[0].name]
         };
 
-        const response = await fetch(`http://127.0.0.1:8080/api/users/${this.selectedUser.id}`, {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/users/${this.selectedUser.id}`, {
           method: 'PATCH',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -285,11 +312,11 @@ export default {
 
         const result = await response.json();
         console.log('Usuario actualizado:', result);
-        alert('Usuario actualizado correctamente.');
+        this.showModalMessage('Usuario actualizado correctamente.');
         this.isEditVisible = false;
       } catch (error) {
         console.error('Error al actualizar el usuario:', error.message);
-        alert(`Error al actualizar el usuario: ${error.message}`);
+        this.showModalMessage(`Error al actualizar el usuario: ${error.message}`);
       }
     },
     async deleteProfessor() {
@@ -297,11 +324,11 @@ export default {
         const token = sessionStorage.getItem('authToken');
         if (!token) {
           console.error('No se encontró el token de autenticación.');
-          alert('No se encontró el token de autenticación. Por favor, inicie sesión.');
+          this.showModalMessage('No se encontró el token de autenticación. Por favor, inicie sesión.');
           return;
         }
 
-        const response = await fetch(`http://127.0.0.1:8080/api/users/${this.selectedUser.id}`, {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/users/${this.selectedUser.id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -314,13 +341,13 @@ export default {
           throw new Error(`Error en la respuesta del servidor: ${response.statusText} - ${errorText}`);
         }
 
-        alert('Usuario eliminado correctamente.');
+        this.showModalMessage('Usuario eliminado correctamente.');
         this.selectedUser = null;
         this.selectedProfessor = '';
         this.fetchUsers();
       } catch (error) {
         console.error('Error al eliminar el usuario:', error.message);
-        alert(`Error al eliminar el usuario: ${error.message}`);
+        this.showModalMessage(`Error al eliminar el usuario: ${error.message}`);
       }
     },
     confirmDeleteProfessor() {
@@ -336,7 +363,7 @@ export default {
           throw new Error('No se encontró el token de autenticación');
         }
 
-        const response = await fetch(`http://127.0.0.1:8080/api/users/${this.selectedProfessor}/ausencias-with-details`, {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/users/${this.selectedProfessor}/ausencias-with-details`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -352,7 +379,7 @@ export default {
         this.ausencias = data;
       } catch (error) {
         console.error('Error al obtener las ausencias:', error.message);
-        alert(`Error al obtener las ausencias: ${error.message}`);
+        this.showModalMessage(`Error al obtener las ausencias: ${error.message}`);
       } finally {
         this.loading = false;
       }
@@ -369,7 +396,7 @@ export default {
           throw new Error('No se encontró el token de autenticación');
         }
 
-        const response = await fetch(`http://127.0.0.1:8080/api/horario/user-details/${this.selectedProfessor}`, {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/horario/user-details/${this.selectedProfessor}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -390,7 +417,7 @@ export default {
         });
       } catch (error) {
         console.error('Error al obtener el horario:', error.message);
-        alert('Error al obtener el horario');
+        this.showModalMessage('Error al obtener el horario');
       } finally {
         this.loading = false;
       }
@@ -399,7 +426,7 @@ export default {
       this.fetchHorario();
     },
     renderSchedule() {
-      const scheduleContainer = this.$refs.scheduleContainer;
+      const scheduleContainer = this.$refs.scheduleContent;
 
       if (!scheduleContainer) {
         console.error('Schedule container not found');
@@ -411,7 +438,13 @@ export default {
 
       const thead = document.createElement('thead');
       const headerRow = document.createElement('tr');
-      const headers = ['Horas', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+      const headers = ['Horas'];
+      if (!this.selectedDay) {
+        headers.push('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes');
+      } else {
+        headers.push(this.getDayName(this.selectedDay));
+      }
+
       headers.forEach(headerText => {
         const th = document.createElement('th');
         th.className = 'border border-gray-200 px-4 py-2';
@@ -451,7 +484,7 @@ export default {
                               </div>`;
         row.appendChild(horaCell);
 
-        const days = ['L', 'M', 'X', 'J', 'V'];
+        const days = this.selectedDay ? [this.selectedDay] : ['L', 'M', 'X', 'J', 'V'];
         days.forEach(day => {
           const dayCell = document.createElement('td');
           dayCell.className = 'border border-gray-200 px-4 py-2';
@@ -472,6 +505,31 @@ export default {
       table.appendChild(tbody);
       scheduleContainer.innerHTML = '';
       scheduleContainer.appendChild(table);
+    },
+    applyFilter() {
+      this.renderSchedule();
+    },
+    clearFilter() {
+      this.selectedDay = '';
+      this.renderSchedule();
+    },
+    getDayName(day) {
+      const dayNames = {
+        'L': 'Lunes',
+        'M': 'Martes',
+        'X': 'Miércoles',
+        'J': 'Jueves',
+        'V': 'Viernes'
+      };
+      return dayNames[day] || day;
+    },
+    showModalMessage(message) {
+      this.modalMessage = message;
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+      this.modalMessage = '';
     }
   },
   watch: {
@@ -491,7 +549,7 @@ export default {
 <style scoped>
 button { color: aliceblue; }
 label { color: aliceblue; }
-input, select { color: aliceblue; }
+input, select, .filter-container select { color: black; }
 .edit-button, .delete-button {
   background: none;
   border: none;
@@ -505,4 +563,24 @@ ul {
 ul li {
   color: var(--color-text, #ffffff);
 }
+@media (max-width: 768px) {
+  .grid-cols-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+}
+.bg-transparent {
+  background-color: transparent;
+}
+.custom-text-color {
+  color: var(--color-text, #ffffff);
+}
+.editUser { 
+  color: #ffffff;
+}
+.schedule-content {
+  background-color: inherit;
+}
 </style>
+

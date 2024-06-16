@@ -11,14 +11,14 @@
       <div v-if="!loading && ausencias.length === 0" class="text-center py-4">No hay ausencias registradas</div>
       <div v-if="!loading && ausencias.length > 0" class="w-3/4">
         <table class="min-w-full bg-gray-800 text-white mt-4">
-          <thead class="bg-gray-900 text-white">
+          <thead class="bg-gray-900 text-white text-center">
             <tr>
-              <th class="w-1/2 px-4 py-2">Fecha</th>
-              <th class="w-1/2 px-4 py-2">Hora</th>
-              <th class="w-1/2 px-4 py-2">Acciones</th>
+              <th class="px-4 py-2">Fecha</th>
+              <th class="px-4 py-2">Hora</th>
+              <th class="px-4 py-2 acciones-col">Acciones</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="text-center">
             <tr v-for="ausencia in paginatedAusencias" :key="ausencia.id">
               <td class="border px-4 py-2">
                 <div v-if="editMode[ausencia.id]">
@@ -40,12 +40,12 @@
                   {{ ausencia.hora ? ausencia.hora : 'Todo el día' }}
                 </div>
               </td>
-              <td class="border px-4 py-2 flex flex-col space-y-2">
-                <div v-if="editMode[ausencia.id]">
+              <td class="border px-4 py-2 acciones-col">
+                <div v-if="editMode[ausencia.id]" class="flex space-x-2 justify-center">
                   <button @click="guardarAusencia(ausencia.id)" class="guardar-btn text-green-600 hover:text-white border border-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">Guardar</button>
                   <button @click="cancelEdit(ausencia.id)" class="cancelar-btn text-gray-700 hover:text-white border border-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">Cancelar</button>
                 </div>
-                <div v-else>
+                <div v-else class="flex space-x-2 justify-center">
                   <button @click="editAusencia(ausencia)" class="editar-btn text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-yellow-300 dark:text-yellow-300 dark:hover:text-white dark:hover:bg-yellow-400 dark:focus:ring-yellow-900">Editar</button>
                   <button @click="confirmEliminarAusencia(ausencia.id)" class="eliminar-btn text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">Eliminar</button>
                 </div>
@@ -120,19 +120,31 @@ export default {
         hora: ''
       },
       currentPage: 1,
-      itemsPerPage: 10,//paginacion y numero de filas por página
+      itemsPerPage: 10, // Paginación y número de filas por página
       loading: true,
-      userId: null
+      userId: null,
+      sortOrder: 'desc' // Orden de ordenación inicial a descendente
     };
   },
   computed: {
     totalPages() {
       return Math.ceil(this.ausencias.length / this.itemsPerPage);
     },
+    sortedAusencias() {
+      return this.ausencias.sort((a, b) => {
+        const dateA = new Date(a.fecha);
+        const dateB = new Date(b.fecha);
+        if (this.sortOrder === 'asc') {
+          return dateA - dateB;
+        } else {
+          return dateB - dateA;
+        }
+      });
+    },
     paginatedAusencias() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      return this.ausencias.slice(start, end);
+      return this.sortedAusencias.slice(start, end);
     }
   },
   async mounted() {
@@ -148,7 +160,7 @@ export default {
           throw new Error('No se encontró el token de autenticación');
         }
 
-        const response = await fetch('http://127.0.0.1:8080/api/user', {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/user`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -182,7 +194,7 @@ export default {
           throw new Error('No se encontró el token de autenticación');
         }
 
-        const response = await fetch('http://127.0.0.1:8080/api/franjas', {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/franjas`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -205,7 +217,7 @@ export default {
           throw new Error('No se encontró el token de autenticación');
         }
 
-        const response = await fetch('http://127.0.0.1:8080/api/ausencias', {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/ausencias`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -269,7 +281,7 @@ export default {
         console.log('Enviando petición con token:', token);
         console.log('Datos enviados:', newAusencia);
 
-        const response = await fetch('http://127.0.0.1:8080/api/ausencias', {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/ausencias`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -291,7 +303,7 @@ export default {
         this.closeModal();
         this.showSuccessMessage = true;
         setTimeout(() => this.showSuccessMessage = false, 3000);
-        await this.fetchAusencias();  // Actualiza tabla después de crear unausencia
+        await this.fetchAusencias();  // Actualiza tabla después de crear una ausencia
       } catch (err) {
         console.error('Error creating ausencia:', err);
         alert(`Error creating ausencia: ${err.message}`);
@@ -348,7 +360,7 @@ export default {
         console.log('Enviando petición con token:', token);
         console.log('Datos enviados:', updatedFields);
 
-        const response = await fetch(`http://127.0.0.1:8080/api/ausencias/${id}`, {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/ausencias/${id}`, {
           method: 'PATCH',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -404,7 +416,7 @@ export default {
 
       console.log('Enviando petición con token:', token);
 
-      fetch(`http://127.0.0.1:8080/api/ausencias/${id}`, {
+      fetch(`${import.meta.env.PUBLIC_URL}/api/ausencias/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -445,11 +457,31 @@ export default {
       if (confirm('¿Está seguro de que quiere eliminar este registro?')) {
         this.eliminarAusencia(id);
       }
+    },
+    toggleSortOrder() {
+      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
     }
   }
 }
 </script>
 
-<style scoped>
 
+<style scoped>
+/* Clases CSS personalizadas para los botones */
+.editar-btn, .eliminar-btn {
+  width: 100px; 
+  text-align: center;
+}
+
+td {
+  padding: 0.5rem; 
+}
+
+th {
+  padding: 0.75rem;
+}
+
+.acciones-col {
+  width: 150px;
+}
 </style>

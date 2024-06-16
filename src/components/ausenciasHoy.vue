@@ -14,8 +14,16 @@
     <div id="faltas-container" class="mt-4 flex justify-center">
       <div class="text-center py-4 text-white">Cargando faltas...</div>
     </div>
+    <!-- Modal -->
+    <div v-if="showModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6">
+        <p class="text-black mb-4">{{ modalMessage }}</p>
+        <button @click="closeModal" class="px-4 py-2 bg-blue-500 text-white rounded-md">Cerrar</button>
+      </div>
+    </div>
   </div>
 </template>
+
 <script>
 export default {
   name: 'FaltasHoy',
@@ -24,7 +32,9 @@ export default {
       faltas: [],
       diaSemana: '',
       selectedDate: '',
-      loading: false 
+      loading: false,
+      showModal: false,
+      modalMessage: '' 
     };
   },
   async mounted() {
@@ -73,7 +83,7 @@ export default {
         const mes = selectedDate.getMonth() + 1; // Obtener mes seleccionado
         const dia = selectedDate.getDate(); // Obtener día seleccionado
 
-        const response = await fetch(`http://127.0.0.1:8080/api/ausencias/mes/${mes}/dia/${dia}`, {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/ausencias/mes/${mes}/dia/${dia}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -104,7 +114,7 @@ export default {
           <th class="w-1/6 px-4 py-2">Nombre</th>
           <th class="w-1/6 px-4 py-2">Fecha</th>
           <th class="w-1/6 px-4 py-2">Hora</th>
-          <th class="w-1/6 px-4 py-2">Id ausencia</th>
+
           <th class="w-1/6 px-4 py-2">Aula</th>
           <th class="w-1/6 px-4 py-2">Grupo</th>
         </tr>
@@ -181,12 +191,13 @@ export default {
       this.loading = true; // Establecer loading a true
       const token = sessionStorage.getItem('authToken');
       if (!token) {
-        alert('No se encontró el token de autenticación');
+        this.modalMessage = 'No se encontró el token de autenticación';
+        this.showModal = true;
         this.loading = false; // Establecer loading a false si hay un error
         return;
       }
 
-      const url = `http://127.0.0.1:8080/api/generate-pdf?date=${this.selectedDate}`;
+      const url = `${import.meta.env.PUBLIC_URL}/api/generate-pdf?date=${this.selectedDate}`;
       fetch(url, {
         method: 'GET',
         headers: {
@@ -198,14 +209,21 @@ export default {
       .then(response => response.json())
       .then(data => {
         if (data.message) {
-          alert(data.message);
+          this.modalMessage = data.message;
+          this.showModal = true;
         }
         this.loading = false; // false cuando la operación termine
       })
       .catch(error => {
         console.error('Error generating PDF:', error);
+        this.modalMessage = 'Error generating PDF';
+        this.showModal = true;
         this.loading = false;// false si hay un error
       });
+    },
+    closeModal() {
+      this.showModal = false;
+      this.modalMessage = '';
     }
   }
 }

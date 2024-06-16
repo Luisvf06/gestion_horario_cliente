@@ -48,7 +48,7 @@ export default {
           return;
         }
 
-        const response = await fetch('http://127.0.0.1:8080/api/user', {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/user`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -77,7 +77,7 @@ export default {
           return;
         }
 
-        const response = await fetch('http://127.0.0.1:8080/api/roles', {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/roles`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -120,7 +120,7 @@ export default {
           password: this.newPassword ? this.newPassword : undefined
         };
 
-        const response = await fetch(`http://127.0.0.1:8080/api/users/${this.user.id}`, {
+        const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/users/${this.user.id}`, {
           method: 'PATCH',
           headers: {
             'Authorization': `Bearer ${token}`,

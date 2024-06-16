@@ -56,7 +56,7 @@ export default {
     };
 
     const goToForgotPassword = () => {
-      window.location.href = '/recuperar-contra'; // Redirige a la página de recuperarion de contraseña
+      window.location.href = '/recuperar-contra'; // no funciona
     };
 
     return {

@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-let user = { name: 'Cargando...', email: '...', id: null, professor_cod: '...' };
+let user = { name: 'Cargando...' };
 let error = null;
 ---
 
@@ -9,16 +9,31 @@ let error = null;
   <div id="error" class="error-message text-white">{error}</div>
   <div class="user-info text-white">
     <h1 id="username">{user.name}</h1>
-    <p><strong>Email:</strong> <span id="user-email">{user.email}</span></p>
-    <p><strong>ID:</strong> <span id="user-id">{user.id}</span></p>
-    <p><strong>Professor Code:</strong> <span id="user-professor-cod">{user.professor_cod}</span></p>
   </div>
-  
-  <div id="schedule-container" class="container mx-auto mt-10 text-white">
+
+  <div class="filter-container text-black">
+    <label for="day-filter" class="text-white"><strong>Elige un día:</strong></label>
+    <select id="day-filter">
+      <option value="">Todos</option>
+      <option value="L">Lunes</option>
+      <option value="M">Martes</option>
+      <option value="X">Miércoles</option>
+      <option value="J">Jueves</option>
+      <option value="V">Viernes</option>
+    </select>
+    <br>
+    <button id="apply-filter" class="bg-blue-500 text-white px-4 py-2 mt-2">Aplicar Filtro</button>
+    <button id="clear-filter" class="bg-gray-500 text-white px-4 py-2 mt-2">Quitar Filtro</button>
   </div>
+
+  <div id="schedule-container" class="container mx-auto mt-10 text-white"></div>
 </Layout>
 
 <script type="module">
+  let horariosData = null;
+  let userData = null;
+  let selectedDay = '';
+
   async function fetchUserData() {
     const token = sessionStorage.getItem('authToken');
     if (!token) {
@@ -39,28 +54,32 @@ let error = null;
       }
 
       const data = await response.json();
-      updateDOM(data);
+      horariosData = data.horarios;
+      userData = data.user;
+      updateDOM(userData, horariosData, selectedDay);
     } catch (err) {
       document.getElementById('error').textContent = err.message;
     }
   }
 
-  function updateDOM(data) {
-    const user = data.user;
-    const horarios = data.horarios;
-
+  function updateDOM(user, horarios, selectedDay) {
     document.getElementById('username').textContent = user.name;
-    document.getElementById('user-email').textContent = user.email;
-    document.getElementById('user-id').textContent = user.id;
-    document.getElementById('user-professor-cod').textContent = user.professor_cod;
 
     const scheduleContainer = document.getElementById('schedule-container');
+    scheduleContainer.innerHTML = ''; // Limpiar el contenido anterior
+
     const table = document.createElement('table');
     table.className = 'min-w-full border-collapse border border-gray-200 text-white';
 
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    const headers = ['Horas', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    const headers = ['Horas'];
+    if (!selectedDay) {
+      headers.push('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes');
+    } else {
+      headers.push(getDayName(selectedDay));
+    }
+
     headers.forEach(headerText => {
       const th = document.createElement('th');
       th.className = 'border border-gray-200 px-4 py-2';
@@ -72,7 +91,6 @@ let error = null;
 
     const tbody = document.createElement('tbody');
 
-    // Agrupa horarios por franja
     const franjas = horarios.reduce((acc, horario) => {
       const horaDesde = horario.franja.hora_desde;
       const horaHasta = horario.franja.hora_hasta;
@@ -86,7 +104,6 @@ let error = null;
       return acc;
     }, {});
 
-    // Crea filas por cada franja
     Object.keys(franjas).forEach(hora => {
       const row = document.createElement('tr');
 
@@ -100,7 +117,7 @@ let error = null;
                             </div>`;
       row.appendChild(horaCell);
 
-      const days = ['L', 'M', 'X', 'J', 'V'];
+      const days = selectedDay ? [selectedDay] : ['L', 'M', 'X', 'J', 'V'];
       days.forEach(day => {
         const dayCell = document.createElement('td');
         dayCell.className = 'border border-gray-200 px-4 py-2';
@@ -114,6 +131,32 @@ let error = null;
     table.appendChild(tbody);
     scheduleContainer.appendChild(table);
   }
+
+  function getDayName(day) {
+    const dayNames = {
+      'L': 'Lunes',
+      'M': 'Martes',
+      'X': 'Miércoles',
+      'J': 'Jueves',
+      'V': 'Viernes'
+    };
+    return dayNames[day] || day;
+  }
+
+  document.getElementById('apply-filter').addEventListener('click', () => {
+    selectedDay = document.getElementById('day-filter').value;
+    if (horariosData && userData) {
+      updateDOM(userData, horariosData, selectedDay);
+    }
+  });
+
+  document.getElementById('clear-filter').addEventListener('click', () => {
+    selectedDay = '';
+    document.getElementById('day-filter').value = '';
+    if (horariosData && userData) {
+      updateDOM(userData, horariosData, selectedDay);
+    }
+  });
 
   fetchUserData();
 </script>

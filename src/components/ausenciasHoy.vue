@@ -114,7 +114,6 @@ export default {
           <th class="w-1/6 px-4 py-2">Nombre</th>
           <th class="w-1/6 px-4 py-2">Fecha</th>
           <th class="w-1/6 px-4 py-2">Hora</th>
-
           <th class="w-1/6 px-4 py-2">Aula</th>
           <th class="w-1/6 px-4 py-2">Grupo</th>
         </tr>
@@ -122,30 +121,20 @@ export default {
       table.appendChild(thead);
 
       const tbody = document.createElement('tbody');
-      const uniqueEntries = new Set();
       this.faltas.forEach(falta => {
-        const horariosDelDia = falta.user.horarios.filter(horario => horario.dia === this.diaSemana);
-        console.log('Horarios del día:', horariosDelDia);
-        if (horariosDelDia.length > 0) {
-          horariosDelDia.forEach(horario => {
-            const uniqueKey = `${falta.user.name}-${falta.hora}`;
-            if (!uniqueEntries.has(uniqueKey)) {
-              uniqueEntries.add(uniqueKey);
-              const tr = document.createElement('tr');
-              tr.innerHTML = this.getReadOnlyRow(falta, horario);
-              tbody.appendChild(tr);
-            }
-          });
-        } else {
-          const uniqueKey = `${falta.user.name}-${falta.hora}`;
-          if (!uniqueEntries.has(uniqueKey)) {
-            uniqueEntries.add(uniqueKey);
-            const tr = document.createElement('tr');
-            tr.innerHTML = this.getNoDataRow(falta);
-            tbody.appendChild(tr);
-          }
-        }
-      });
+  const franjasCorrespondientes = falta.user.horarios.filter(horario => horario.dia === this.diaSemana && horario.franja.hora_desde === falta.hora);
+  if (franjasCorrespondientes.length > 0) {
+    franjasCorrespondientes.forEach(franjaCorrespondiente => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = this.getReadOnlyRow(falta, franjaCorrespondiente);
+      tbody.appendChild(tr);
+    });
+  } else {
+    const tr = document.createElement('tr');
+    tr.innerHTML = this.getNoDataRow(falta);
+    tbody.appendChild(tr);
+  }
+});
       table.appendChild(tbody);
 
       tableContainer.appendChild(table);
@@ -165,7 +154,6 @@ export default {
         <td class="border px-4 py-2 text-black">${falta.user.name}</td>
         <td class="border px-4 py-2 text-black">${fechaFormateada}</td>
         <td class="border px-4 py-2 text-black">${hora}</td>
-        <td class="border px-4 py-2 text-black">${falta.id}</td>
         <td class="border px-4 py-2 text-black">${horario.aula.descripcion}</td>
         <td class="border px-4 py-2 text-black">${horario.grupo.descripcion}</td>
       `;
@@ -183,7 +171,6 @@ export default {
         <td class="border px-4 py-2 text-black">${falta.user.name}</td>
         <td class="border px-4 py-2 text-black">${fechaFormateada}</td>
         <td class="border px-4 py-2 text-black">${hora}</td>
-        <td class="border px-4 py-2 text-black">${falta.id}</td>
         <td class="border px-4 py-2 text-black" colspan="2">No hay datos</td>
       `;
     },

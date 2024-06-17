@@ -37,8 +37,8 @@
         <div class="grid grid-cols-2 gap-4 mb-4">
           <button @click="isEditVisible = true" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-700">Editar Usuario</button>
           <button @click="confirmDeleteProfessor" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700">Eliminar Usuario</button>
-          <button @click="showFaltas" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700">Ver Faltas</button>
-          <button @click="showHorario" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Ver Horario</button>
+          <button @click="toggleFaltas" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700">Ver Faltas</button>
+          <button @click="toggleHorario" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Ver Horario</button>
         </div>
 
         <!-- Formulario de edición -->
@@ -127,7 +127,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 export default {
@@ -384,9 +383,12 @@ export default {
         this.loading = false;
       }
     },
-    showFaltas() {
-      this.fetchAusencias();
-      this.isFaltasVisible = true;
+    toggleFaltas() {
+      this.isFaltasVisible = !this.isFaltasVisible;
+      if (this.isFaltasVisible) {
+        this.isHorarioVisible = false;
+        this.fetchAusencias();
+      }
     },
     async fetchHorario() {
       this.loading = true;
@@ -422,8 +424,12 @@ export default {
         this.loading = false;
       }
     },
-    showHorario() {
-      this.fetchHorario();
+    toggleHorario() {
+      this.isHorarioVisible = !this.isHorarioVisible;
+      if (this.isHorarioVisible) {
+        this.isFaltasVisible = false;
+        this.fetchHorario();
+      }
     },
     renderSchedule() {
       const scheduleContainer = this.$refs.scheduleContent;
@@ -583,4 +589,3 @@ ul li {
   background-color: inherit;
 }
 </style>
-

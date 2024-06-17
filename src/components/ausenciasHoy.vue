@@ -16,9 +16,12 @@
     </div>
     <!-- Modal -->
     <div v-if="showModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6">
+      <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-auto">
         <p class="text-black mb-4">{{ modalMessage }}</p>
-        <button @click="closeModal" class="px-4 py-2 bg-blue-500 text-white rounded-md">Cerrar</button>
+        <div class="flex justify-end">
+          <button @click="confirmAction" class="px-4 py-2 bg-red-500 text-white rounded-md">Confirmar</button>
+          <button @click="closeModal" class="px-4 py-2 bg-blue-500 text-white rounded-md ml-2">Cerrar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -34,7 +37,8 @@ export default {
       selectedDate: '',
       loading: false,
       showModal: false,
-      modalMessage: '' 
+      modalMessage: '',
+      modalAction: null
     };
   },
   async mounted() {
@@ -80,8 +84,8 @@ export default {
         }
 
         const selectedDate = new Date(this.selectedDate);
-        const mes = selectedDate.getMonth() + 1; // Obtener mes seleccionado
-        const dia = selectedDate.getDate(); // Obtener día seleccionado
+        const mes = selectedDate.getMonth() + 1; // Obtener mes elegido
+        const dia = selectedDate.getDate(); // Obtener día 
 
         const response = await fetch(`${import.meta.env.PUBLIC_URL}/api/ausencias/mes/${mes}/dia/${dia}`, {
           headers: {
@@ -175,7 +179,7 @@ export default {
       `;
     },
     generatePDF() {
-      this.loading = true; // Establecer loading a true
+      this.loading = true; // Establece loading a true
       const token = sessionStorage.getItem('authToken');
       if (!token) {
         this.modalMessage = 'No se encontró el token de autenticación';
@@ -199,18 +203,30 @@ export default {
           this.modalMessage = data.message;
           this.showModal = true;
         }
-        this.loading = false; // false cuando la operación termine
+        this.loading = false; 
       })
       .catch(error => {
         console.error('Error generating PDF:', error);
         this.modalMessage = 'Error generating PDF';
         this.showModal = true;
-        this.loading = false;// false si hay un error
+        this.loading = false;
       });
+    },
+    confirmAction() {
+      if (this.modalAction) {
+        this.modalAction();
+        this.closeModal();
+      }
     },
     closeModal() {
       this.showModal = false;
       this.modalMessage = '';
+      this.modalAction = null; 
+    },
+    showDeleteConfirmation(action) {
+      this.modalMessage = '¿Estás seguro de que quieres eliminar esta falta?';
+      this.modalAction = action;
+      this.showModal = true;
     }
   }
 }

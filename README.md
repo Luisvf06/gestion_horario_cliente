@@ -1,54 +1,26 @@
-# Astro Starter Kit: Basics
-El componente navbar.vue no tiene las url de .env porque se rompe el logout, igual que las paginas horario y guardiasHoy
-```sh
-npm create astro@latest -- --template basics
-```
+# Aspectos generales
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+Las páginas principales se encuentran en el directorio pages, la principal es index.astro donde se encuentra importado el elemento login.vue. Está correctamente validado y securizado para que tras hacer login se redirija al archivo horario.astro y tras hacer logout desde cualquier otra página vuelva a index.astro
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Todos los componentes de pages importan otros de vue, que se encuentran en el directorio components. Las únicas páginas que no importan componentes de vue son: horario.astro y guardiasHoy.astro, debido a que tras hacer la petición inicial al servidor, no vuelven a requerir JS por lo que no necesita de interoperabilidad continuada.
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
+Los componentes que sí tienen importados componentes de vue, renderizan el html y css y al acceder a ellos, cargan también el JavaScript de los componentes vue que contienen.
 
-## 🚀 Project Structure
+Las peticiones que se usan en la aplicación son POST: login y crear mandar datos al servidor para crear registros en la base de datos; PATCH para alterar registros;  Delete, para eliminar registros. He prescindido de Put ya que es muy similar a un Patch y con este último puedo hacer lo mismo. La petición que predomina es GET ya que la he usado para hacer todas las peticiones a la base de datos a través del servidor.
 
-Inside of your Astro project, you'll see the following folders and files:
+## Aspectos secundarios
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── components/
-│   │   └── Card.astro
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+Los estilos se encuentran en el directorio layouts. Son básicamente los estilos que incluye Astro por defecto salvo algunas mofificaciones que incluí para, según yo mejorar la usabilidad, como por ejemplo el cambio de fuente por una responsive.
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+La navegación a través de la aplicación se articula a través de la barra de navegación, que en encuentra en el componente navbarvue.vue y es llamada en el archivo Layout.astro, de esta forma me he asegurado que sólo aparece para los usuarios logueados. 
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Validaciones y seguridad
 
-Any static assets, like images, can be placed in the `public/` directory.
+En cuanto a validaciones, algunos ejemplos son que la contraseña a la hora de cambiarse requiere de al menos una longitud de 8 carácteres que debe incluir mayúscula, minúscula y un dígito. Otra validación es a la hora de crear ausencias, donde es imposible crear una ausencia de un día anterior al presente.
 
-## 🧞 Commands
+Por último hay secciones protegidas de la barra de navegación como son plantilla docente y faltas hoy, que sólo son accesibles para usuarios que tienen el rol admin.
 
-All commands are run from the root of the project, from a terminal:
+## Explicación de variables y expresiones
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+A lo largo del proyecto, es evidente que el nombre de las variables y funciones es muy diferente, ya que cambia de estilo e idioma. Esto se debe a dos motivos, en primer lugar el uso parcial de Copilot, que recomienda texto y hace la escritura de código más rápida, y en segundo lugar el aprendizaje de buenas prácticas en la empresa, que me ha enseñado a escribir siempre los nombre de variables y funciones en ingles.
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

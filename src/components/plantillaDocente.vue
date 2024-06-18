@@ -35,20 +35,20 @@
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4" v-if="selectedUser">
         <h2 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">{{ selectedUser.name }}</h2>
         <div class="grid grid-cols-2 gap-4 mb-4">
-          <button @click="isEditVisible = true" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-700">Editar Usuario</button>
+          <button @click="toggleEdit" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-700">Editar Usuario</button>
           <button @click="confirmDeleteProfessor" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700">Eliminar Usuario</button>
           <button @click="toggleFaltas" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700">Ver Faltas</button>
           <button @click="toggleHorario" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Ver Horario</button>
         </div>
 
         <!-- Formulario de edición -->
-        <div v-if="isEditVisible" class="mt-4 ">
+        <div v-if="isEditVisible" class="mt-4">
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Nombre:</label>
           <input v-model="selectedUser.name" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
-          
+
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Username:</label>
           <input v-model="selectedUser.user_name" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
-          
+
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Email:</label>
           <input v-model="selectedUser.email" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
 
@@ -57,7 +57,7 @@
 
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Código de Profesor:</label>
           <input v-model="selectedUser.professor_cod" type="text" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
-          
+
           <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Rol:</label>
           <select v-model="selectedUser.roles[0].name" class="block w-full mb-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 editUser">
             <option v-for="role in roles" :key="role.id" :value="role.name">{{ role.name }}</option>
@@ -80,17 +80,13 @@
               <tr>
                 <th class="w-1/2 px-4 py-2">Fecha</th>
                 <th class="w-1/2 px-4 py-2">Hora</th>
-                <th class="w-1/2 px-4 py-2">Acciones</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="ausencia in ausencias" :key="ausencia.id">
                 <td class="border px-4 py-2">{{ ausencia.fecha }}</td>
                 <td class="border px-4 py-2">{{ ausencia.hora }}</td>
-                <td class="border px-4 py-2 flex flex-col space-y-2">
-                  <button @click="editAusencia(ausencia)" class="text-yellow-400 hover:text-white border border-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Editar</button>
-                  <button @click="confirmEliminarAusencia(ausencia.id)" class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Eliminar</button>
-                </td>
+
               </tr>
             </tbody>
           </table>
@@ -383,10 +379,18 @@ export default {
         this.loading = false;
       }
     },
+    toggleEdit() {
+      this.isEditVisible = !this.isEditVisible;
+      if (this.isEditVisible) {
+        this.isFaltasVisible = false;
+        this.isHorarioVisible = false;
+      }
+    },
     toggleFaltas() {
       this.isFaltasVisible = !this.isFaltasVisible;
       if (this.isFaltasVisible) {
         this.isHorarioVisible = false;
+        this.isEditVisible = false;
         this.fetchAusencias();
       }
     },
@@ -428,6 +432,7 @@ export default {
       this.isHorarioVisible = !this.isHorarioVisible;
       if (this.isHorarioVisible) {
         this.isFaltasVisible = false;
+        this.isEditVisible = false;
         this.fetchHorario();
       }
     },

@@ -50,7 +50,7 @@ export default {
           window.location.href = '/horario';
         }
       } catch (error) {
-        errorMsg.value = 'Error al iniciar sesión: ' + error.message;
+        errorMsg.value = 'Error al iniciar sesión compruebe sus datos';
         console.error(error);
       }
     };

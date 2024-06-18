@@ -6,10 +6,10 @@
       <button @click="nextPage" :disabled="currentPage === totalPages" class="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-800">Siguiente</button>
     </div>
 
-    <div id="ausencias-container" class="mt-4 flex justify-center">
-      <div v-if="loading" class="text-center py-4">Cargando ausencias...</div>
-      <div v-if="!loading && ausencias.length === 0" class="text-center py-4">No hay ausencias registradas</div>
-      <div v-if="!loading && ausencias.length > 0" class="w-3/4">
+    <div id="ausencias-container" class="mt-4 flex justify-center sm:justify-start">
+      <div v-if="loading" class="text-center py-4 noAusencias">Cargando ausencias...</div>
+      <div v-if="!loading && ausencias.length === 0" class="text-center py-4 noAusencias">No hay ausencias registradas</div>
+      <div v-if="!loading && ausencias.length > 0" class="w-full sm:w-3/4">
         <table class="min-w-full bg-gray-800 text-white mt-4">
           <thead class="bg-gray-900 text-white text-center">
             <tr>
@@ -93,9 +93,43 @@
       </div>
     </div>
 
-    <!-- Mensaje de confirmación -->
+    <!-- Modal de confirmación -->
+    <div v-if="showConfirmModal" class="fixed z-10 inset-0 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Eliminar Registro</h3>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500">¿Está seguro de que quiere eliminar este registro? Esta acción no se puede deshacer.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button @click="eliminarAusencia(confirmModalId)" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Eliminar</button>
+            <button @click="closeConfirmModal" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensajes de confirmación -->
     <div v-if="showSuccessMessage" class="fixed bottom-0 right-0 mb-4 mr-4 bg-green-500 text-white p-4 rounded-lg shadow-lg">
       Ausencia creada correctamente.
+    </div>
+    <div v-if="showDeleteSuccessMessage" class="fixed bottom-0 right-0 mb-4 mr-4 bg-red-500 text-white p-4 rounded-lg shadow-lg">
+      Ausencia eliminada correctamente.
     </div>
   </div>
 </template>
@@ -110,7 +144,9 @@ export default {
       editMode: {},
       newRow: null,
       showModal: false,
+      showConfirmModal: false, // Modal de confirmación
       showSuccessMessage: false,
+      showDeleteSuccessMessage: false, // Mensaje de éxito de eliminación
       newAusencia: {
         fecha: '',
         hora: ''
@@ -123,7 +159,8 @@ export default {
       itemsPerPage: 10, // Paginación y número de filas por página
       loading: true,
       userId: null,
-      sortOrder: 'desc' // Orden de ordenación inicial a descendente
+      sortOrder: 'desc', // Orden de ordenación inicial a descendente
+      confirmModalId: null // ID de la ausencia a eliminar
     };
   },
   computed: {
@@ -247,6 +284,14 @@ export default {
     },
     closeModal() {
       this.showModal = false;
+    },
+    openConfirmModal(id) {
+      this.confirmModalId = id;
+      this.showConfirmModal = true;
+    },
+    closeConfirmModal() {
+      this.confirmModalId = null;
+      this.showConfirmModal = false;
     },
     async guardarNuevaAusencia() {
       const { fecha, hora } = this.newAusencia;
@@ -442,7 +487,9 @@ export default {
       })
       .then(async data => {
         console.log('Ausencia eliminada:', data);
-        alert('Ausencia eliminada correctamente');
+        this.closeConfirmModal(); // Cierra el modal de confirmación después de eliminar
+        this.showDeleteSuccessMessage = true; // Muestra el mensaje de éxito de eliminación
+        setTimeout(() => this.showDeleteSuccessMessage = false, 3000); // Oculta el mensaje después de 3 segundos
 
         this.ausencias = this.ausencias.filter(a => a.id !== id);
 
@@ -454,9 +501,7 @@ export default {
       });
     },
     confirmEliminarAusencia(id) {
-      if (confirm('¿Está seguro de que quiere eliminar este registro?')) {
-        this.eliminarAusencia(id);
-      }
+      this.openConfirmModal(id);
     },
     toggleSortOrder() {
       this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
@@ -465,9 +510,8 @@ export default {
 }
 </script>
 
-
 <style scoped>
-/* Clases CSS personalizadas para los botones */
+
 .editar-btn, .eliminar-btn {
   width: 100px; 
   text-align: center;
@@ -483,5 +527,21 @@ th {
 
 .acciones-col {
   width: 150px;
+}
+.noAusencias {
+  color: white;
+}
+
+/* Añadir clases para ajustar la tabla en pantallas pequeñas */
+@media (max-width: 640px) {
+  .container {
+    padding: 0; /* Eliminar el padding del contenedor */
+  }
+  #ausencias-container {
+    justify-content: flex-start; /* Alinear el contenido al inicio (izquierda) */
+  }
+  .acciones-col {
+    width: auto; /* Ajustar el ancho de la columna de acciones */
+  }
 }
 </style>
